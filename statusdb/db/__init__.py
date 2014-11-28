@@ -4,7 +4,7 @@ import sys
 import couchdb
 
 from statusdb.utils.log import minimal_logger
-from scilifelab.utils.http import check_url
+from statusdb.utils.http import check_url
 
 class ConnectionError(Exception):
     """Exception raised for connection errors.
