@@ -1,6 +1,6 @@
 """Miscallaneous methods"""
 import sys
-from statusdb.utils.log import minimal_logger
+from statusdb.tools.log import minimal_logger
 
 LOG = minimal_logger(__name__)
 

@@ -2,9 +2,8 @@
 import os
 import sys
 import couchdb
-
-from statusdb.utils.log import minimal_logger
-from statusdb.utils.http import check_url
+from statusdb.tools.http import check_url
+from statusdb.tools.log import minimal_logger
 
 class ConnectionError(Exception):
     """Exception raised for connection errors.

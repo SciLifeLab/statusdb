@@ -4,9 +4,9 @@ import collections
 from uuid import uuid4
 from itertools import izip
 from statusdb.db import Couch
+from statusdb.db.utils import save_couchdb_obj
 from statusdb.tools.log import minimal_logger
 from statusdb.tools.misc import query_yes_no, merge
-from statusdb.db.utils import save_couchdb_obj
 
 LOG = minimal_logger(__name__)
 
