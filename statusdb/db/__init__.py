@@ -2,8 +2,10 @@
 import os
 import sys
 import couchdb
+import ConfigParser
 from statusdb.tools.http import check_url
 from statusdb.tools.log import minimal_logger
+from statusdb.tools import config as statusdb_config
 
 class ConnectionError(Exception):
     """Exception raised for connection errors.
@@ -25,9 +27,9 @@ class Database(object):
     def __init__(self, **kwargs):
         self.con = None
         self.log = minimal_logger(repr(self))
-        self.connect(**kwargs)
+        self.connect()
 
-    def connect(self, **kwargs):
+    def connect(self):
         pass
 
     def save(self, **kwargs):
@@ -41,16 +43,45 @@ class Couch(Database):
     _doc_type = None
     _update_fn = None
 
-    def __init__(self, log=None, url="localhost", **kwargs):
-        self.db = None
-        self.url = url
+    def __init__(self, log=None, url=None, **kwargs):
+        
+        # Set defaults
         self.port = 5984
-        self.user = kwargs.get("username", None)
-        self.pw = kwargs.get("password", None)
+        self.db = None
+        self.user = None
+        self.pw = None
+        self.url = 'localhost'
+        
+        # Load from config if we have one
+        config = statusdb_config.load_config()
+        if config.has_option('statusdb', 'port'):
+            self.port = config.get('statusdb', 'port')
+        if config.has_option('statusdb', 'db'):
+            self.db = config.get('statusdb', 'db')
+        if config.has_option('statusdb', 'url'):
+            self.url = config.get('statusdb', 'url')
+        if config.has_option('statusdb', 'username'):
+            self.user = config.get('statusdb', 'username')
+        if config.has_option('statusdb', 'password'):
+            self.pw = config.get('statusdb', 'password')
+        
+        # Overwrite with command line options if we have them
+        if 'username' in kwargs:
+            self.user = kwargs['username']
+        if 'pw' in kwargs:
+            self.pw = kwargs['password']
+        if 'port' in kwargs:
+            self.port = kwargs['port']
+        if 'db' in kwargs:
+            self.db = kwargs['db']
+        if 'url' in kwargs:
+            self.url = kwargs['url']
+        
+        # Connect to the database
         if self.user and self.pw:
             self.url_string = "http://{}:{}@{}:{}".format(self.user, self.pw, self.url, self.port)
             self.display_url_string = "http://{}:{}@{}:{}".format(self.user, "*********", self.url, self.port)
-        else:
+        else:            
             self.url_string = "http://{}:{}".format(self.url, self.port)
             self.display_url_string = "http://{}:{}".format(self.url, self.port)
         if log:
@@ -59,8 +90,8 @@ class Couch(Database):
         if not self.con:
             raise ConnectionError("Connection failed for url {}".format(self.display_url_string))
 
-    def connect(self, username=None, password=None, url="localhost", port=5984, **kw):
-        if not username or not password or not url:
+    def connect(self):
+        if not self.user or not self.pw or not self.url:
             self.log.warn("please supply username, password, and url")
             return None
         if not check_url(self.url_string):
@@ -68,8 +99,6 @@ class Couch(Database):
             return None
         self.con = couchdb.Server(url=self.url_string)
         self.log.debug("Connected to server @{}".format(self.display_url_string))
-        self.user = username
-        self.pw = password
 
     def set_db(self, dbname):
         """Set database to use
