@@ -43,7 +43,7 @@ class Couch(Database):
     _doc_type = None
     _update_fn = None
 
-    def __init__(self, log=None, url=None, **kwargs):
+    def __init__(self, log=None, url=None,conf=None, **kwargs):
         
         # Set defaults
         self.port = 5984
@@ -53,17 +53,12 @@ class Couch(Database):
         self.url = 'localhost'
         
         # Load from config if we have one
-        config = statusdb_config.load_config()
-        if config.has_option('statusdb', 'port'):
-            self.port = config.get('statusdb', 'port')
-        if config.has_option('statusdb', 'db'):
-            self.db = config.get('statusdb', 'db')
-        if config.has_option('statusdb', 'url'):
-            self.url = config.get('statusdb', 'url')
-        if config.has_option('statusdb', 'username'):
-            self.user = config.get('statusdb', 'username')
-        if config.has_option('statusdb', 'password'):
-            self.pw = config.get('statusdb', 'password')
+        config = statusdb_config.load_config(conf)
+        self.port = config.get('statusdb',{}).get('port')
+        self.db= config.get('statusdb',{}).get('db')
+        self.url= config.get('statusdb',{}).get('url')
+        self.user = config.get('statusdb',{}).get('username')
+        self.pw = config.get('statusdb',{}).get('password')
         
         # Overwrite with command line options if we have them
         if 'username' in kwargs:

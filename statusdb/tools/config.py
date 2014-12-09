@@ -1,6 +1,6 @@
 """ Load and parse configuration file
 """
-import ConfigParser
+import yaml
 import os
 
 def load_config(config_file=None):
@@ -9,14 +9,11 @@ def load_config(config_file=None):
     By default it assumes ~/.ngi_config/statusdb.conf
     """
     try:
-        if not config_file:
-            config_file = os.path.join(os.environ.get('HOME'), '.ngi_config', 'statusdb.conf')
-        if os.path.exists(config_file):
-            config = ConfigParser.SafeConfigParser()
-            with open(config_file) as f:
-                config.readfp(f)
-            return config
+        yaml_config = os.path.join(os.environ.get('HOME'), '.ngi_config', 'statusdb.yaml')
+        with open(yaml_config) as f:
+            conf = yaml.load(f)
+            return conf
     except IOError:
         raise IOError(("There was a problem loading the configuration file. "
-                "Please make sure that ~/.ngi_config/statusdb.conf "
+                "Please make sure that ~/.ngi_config/statusdb.yaml"
                 "can be opened"))
