@@ -35,10 +35,11 @@ This file should be formatted for
 and look like this:
 
 ```bash
-[db]
-url = <full url of the database>
-user = <login as user>
-password = <password to use>
+[statusdb]
+username: <login as user>
+password: <password to use>
+url: <full url of the database>
+port: <port>
 ```
 
 ## Usage
@@ -56,6 +57,6 @@ samples = proj['samples']
 
 ## Contributors
 * [Panneerselvam Senthilkumar](https://github.com/senthil10) and [Phil Ewels](https://github.com/ewels)
-  * Pulled code into own repository and 
+  * Pulled code into own repository and updated methods.
 * [Per Unneberg](https://github.com/percyfal)
-  * Wrote original code, as part of the [scilifelab](https://github.com/SciLifeLab/scilifelab) repository
+  * Wrote original code, as part of the [scilifelab](https://github.com/SciLifeLab/scilifelab) repository.
