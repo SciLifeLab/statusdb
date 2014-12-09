@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 from uuid import uuid4
 from datetime import datetime
+import yaml
+import couchdb
+
+
+def load_couch_server(config_file):
+    """loads couch server with settings specified in 'config_file'"""
+    try:
+        stream = open(config_file,'r')
+        db_conf = yaml.load(stream)['statusdb']
+        url = db_conf['username']+':'+db_conf['password']+'@'+db_conf['url']+':'+str(db_conf['port'])
+        couch = couchdb.Server("http://" + url)
+        return couch
+    except KeyError:
+        raise RuntimeError("\"statusdb\" section missing from configuration file.")
 
 def find_or_make_key(key):
     if not key:
