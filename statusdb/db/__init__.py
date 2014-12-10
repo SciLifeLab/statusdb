@@ -45,20 +45,22 @@ class Couch(Database):
 
     def __init__(self, log=None, url=None,conf=None, **kwargs):
         
-        # Set defaults
-        self.port = 5984
-        self.db = None
-        self.user = None
-        self.pw = None
-        self.url = 'localhost'
-        
         # Load from config if we have one
         config = statusdb_config.load_config(conf)
-        self.port = config.get('statusdb',{}).get('port')
-        self.db= config.get('statusdb',{}).get('db')
-        self.url= config.get('statusdb',{}).get('url')
-        self.user = config.get('statusdb',{}).get('username')
-        self.pw = config.get('statusdb',{}).get('password')
+        try:
+            statconf=config['statusdb']
+        except KeyError:
+            raise NameError("The configuration file does not have a 'statusdb' key")
+        else:
+            try:
+                self.port = config['statusdb']['port']
+                self.url= config['statusdb']['url']
+            except KeyError:
+                raise NameError("The configuration file is missing an essential key, either url or port")
+            self.user= config['statusdb'].get('username')
+            self.pw= config['statusdb'].get('password')
+            self.db= config['statusdb'].get('db')
+
         
         # Overwrite with command line options if we have them
         if 'username' in kwargs:

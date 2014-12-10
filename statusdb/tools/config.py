@@ -6,7 +6,7 @@ import os
 def load_config(config_file=None):
     """Loads a configuration file.
 
-    By default it assumes ~/.ngi_config/statusdb.conf
+    By default it assumes ~/.ngi_config/statusdb.yaml
     """
     try:
         yaml_config = os.path.join(os.environ.get('HOME'), '.ngi_config', 'statusdb.yaml')
@@ -16,5 +16,4 @@ def load_config(config_file=None):
             return conf
     except IOError:
         raise IOError(("There was a problem loading the configuration file. "
-                "Please make sure that ~/.ngi_config/statusdb.yaml"
-                "can be opened"))
+                "Please make sure that {} can be opened".format(config)))
