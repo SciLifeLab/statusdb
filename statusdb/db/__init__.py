@@ -50,15 +50,15 @@ class Couch(Database):
         try:
             statconf=config['statusdb']
         except KeyError:
-            raise NameError("The configuration file does not have a 'statusdb' key")
+            raise KeyError("The configuration file does not have a 'statusdb' key")
         else:
             try:
                 self.port = config['statusdb']['port']
                 self.url= config['statusdb']['url']
+                self.user= config['statusdb']['username']
+                self.pw= config['statusdb']['password']
             except KeyError:
-                raise NameError("The configuration file is missing an essential key, either url or port")
-            self.user= config['statusdb'].get('username')
-            self.pw= config['statusdb'].get('password')
+                raise KeyError("The configuration file is missing an essential key, either 'url', 'port', 'username', or 'password'")
             self.db= config['statusdb'].get('db')
 
         
@@ -75,12 +75,8 @@ class Couch(Database):
             self.url = kwargs['url']
         
         # Connect to the database
-        if self.user and self.pw:
-            self.url_string = "http://{}:{}@{}:{}".format(self.user, self.pw, self.url, self.port)
-            self.display_url_string = "http://{}:{}@{}:{}".format(self.user, "*********", self.url, self.port)
-        else:            
-            self.url_string = "http://{}:{}".format(self.url, self.port)
-            self.display_url_string = "http://{}:{}".format(self.url, self.port)
+        self.url_string = "http://{}:{}@{}:{}".format(self.user, self.pw, self.url, self.port)
+        self.display_url_string = "http://{}:{}@{}:{}".format(self.user, "*********", self.url, self.port)
         if log:
             self.log = log
         super(Couch, self).__init__(**kwargs)        
@@ -88,9 +84,6 @@ class Couch(Database):
             raise ConnectionError("Connection failed for url {}".format(self.display_url_string))
 
     def connect(self):
-        if not self.user or not self.pw or not self.url:
-            self.log.warn("please supply username, password, and url")
-            return None
         if not check_url(self.url_string):
             self.log.warn("No such url {}".format(self.display_url_string))
             return None
