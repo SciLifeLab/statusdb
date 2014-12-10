@@ -10,7 +10,8 @@ def load_config(config_file=None):
     """
     try:
         yaml_config = os.path.join(os.environ.get('HOME'), '.ngi_config', 'statusdb.yaml')
-        with open(yaml_config) as f:
+        config=config_file or yaml_config
+        with open(config) as f:
             conf = yaml.load(f)
             return conf
     except IOError:
