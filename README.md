@@ -27,19 +27,18 @@ Finally, you need a config file with the information that the package requires
 to connect to the database. This is held within a config file in your home directory:
 
 ```
-~/.ngi_config/statusdb.conf
+~/.ngi_config/statusdb.yaml
 ```
 
-This file should be formatted for 
-[Python ConfigParser](https://docs.python.org/2/library/configparser.html)
+This file should be yaml formatted 
 and look like this:
 
 ```bash
-[statusdb]
-username: <login as user>
-password: <password to use>
-url: <full url of the database>
-port: <port>
+statusdb:
+    username: <login as user>
+    password: <password to use>
+    url: <full url of the database>
+    port: <port>
 ```
 
 ## Usage
