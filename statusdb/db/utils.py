@@ -59,21 +59,6 @@ def comp_obj(obj, dbobj):
     else:
         return False
 
-def notworking_dont_load_status_if_20158_not_found(obj, dbobj):
-    """compares the two dictionaries obj and dbobj"""
-    check_fields = ["status", "m_reads_sequenced"]
-    obj_samples, dbobj_samples = obj.get("samples"), dbobj.get("samples")
-    if obj_samples and dbobj_samples:
-        for sam in obj_samples.keys():
-            if sam in dbobj_samples.keys():
-                for field in check_fields:
-                    if field in obj_samples[sam] and obj_samples[sam][field]=='doc_not_found':
-                        obj_samples[sam][field] = dbobj_samples[sam].get(field)
-                    if not obj_samples[sam][field] or obj_samples[sam][field]=='doc_not_found':
-                        obj_samples[sam].pop(field)
-    return obj
-
-
 def dont_load_status_if_20158_not_found(obj, dbobj):
     """compares the two dictionaries obj and dbobj"""
     if obj.has_key('samples') and dbobj.has_key('samples'):
