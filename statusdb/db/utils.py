@@ -59,18 +59,43 @@ def comp_obj(obj, dbobj):
     else:
         return False
 
-def dont_load_status_if_20158_not_found(obj, dbobj):
+def notworking_dont_load_status_if_20158_not_found(obj, dbobj):
     """compares the two dictionaries obj and dbobj"""
     check_fields = ["status", "m_reads_sequenced"]
     obj_samples, dbobj_samples = obj.get("samples"), dbobj.get("samples")
-    if obj_samples and dbj_samples:
-        for sam in obj_samples.key():
+    if obj_samples and dbobj_samples:
+        for sam in obj_samples.keys():
             if sam in dbobj_samples.keys():
                 for field in check_fields:
                     if field in obj_samples[sam] and obj_samples[sam][field]=='doc_not_found':
                         obj_samples[sam][field] = dbobj_samples[sam].get(field)
                     if not obj_samples[sam][field] or obj_samples[sam][field]=='doc_not_found':
                         obj_samples[sam].pop(field)
+    return obj
+
+
+def dont_load_status_if_20158_not_found(obj, dbobj):
+    """compares the two dictionaries obj and dbobj"""
+    if obj.has_key('samples') and dbobj.has_key('samples'):
+        keys = list(set(obj['samples'].keys() + dbobj['samples'].keys()))
+        for key in keys:
+            if obj['samples'].has_key(key) and dbobj['samples'].has_key(key):
+                if obj['samples'][key].has_key('status'):
+                    if obj['samples'][key]['status'] == 'doc_not_found':
+                        if dbobj['samples'][key].has_key('status'):
+                            obj['samples'][key]['status'] = dbobj['samples'][key]['status']
+                if obj['samples'][key].has_key('m_reads_sequenced'):
+                    if obj['samples'][key]['m_reads_sequenced'] == 'doc_not_found':
+                        if dbobj['samples'][key].has_key('m_reads_sequenced'):
+                            obj['samples'][key]['m_reads_sequenced'] = dbobj['samples'][key]['m_reads_sequenced']
+            try:
+                if (obj['samples'][key]['status'] == 'doc_not_found') or (obj['samples'][key]['status'] == None):
+                    obj['samples'][key].pop('status')
+            except: pass
+            try:
+                if (obj['samples'][key]['m_reads_sequenced'] == 'doc_not_found') or (obj['samples'][key]['m_reads_sequenced'] == None):
+                    obj['samples'][key].pop('m_reads_sequenced')
+            except: pass
     return obj
 
 def find_proj_from_view(proj_db, project_name):
