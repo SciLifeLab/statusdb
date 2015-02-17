@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 from uuid import uuid4
 from datetime import datetime
+import yaml
+import couchdb
+
+
+def load_couch_server(config_file):
+    """loads couch server with settings specified in 'config_file'"""
+    try:
+        stream = open(config_file,'r')
+        db_conf = yaml.load(stream)['statusdb']
+        url = db_conf['username']+':'+db_conf['password']+'@'+db_conf['url']+':'+str(db_conf['port'])
+        couch = couchdb.Server("http://" + url)
+        return couch
+    except KeyError:
+        raise RuntimeError("\"statusdb\" section missing from configuration file.")
 
 def find_or_make_key(key):
     if not key:
@@ -47,16 +61,26 @@ def comp_obj(obj, dbobj):
 
 def dont_load_status_if_20158_not_found(obj, dbobj):
     """compares the two dictionaries obj and dbobj"""
-    check_fields = ["status", "m_reads_sequenced"]
-    obj_samples, dbobj_samples = obj.get("samples"), dbobj.get("samples")
-    if obj_samples and dbj_samples:
-        for sam in obj_samples.key():
-            if sam in dbobj_samples.keys():
-                for field in check_fields:
-                    if field in obj_samples[sam] and obj_samples[sam][field]=='doc_not_found':
-                        obj_samples[sam][field] = dbobj_samples[sam].get(field)
-                    if not obj_samples[sam][field] or obj_samples[sam][field]=='doc_not_found':
-                        obj_samples[sam].pop(field)
+    if obj.has_key('samples') and dbobj.has_key('samples'):
+        keys = list(set(obj['samples'].keys() + dbobj['samples'].keys()))
+        for key in keys:
+            if obj['samples'].has_key(key) and dbobj['samples'].has_key(key):
+                if obj['samples'][key].has_key('status'):
+                    if obj['samples'][key]['status'] == 'doc_not_found':
+                        if dbobj['samples'][key].has_key('status'):
+                            obj['samples'][key]['status'] = dbobj['samples'][key]['status']
+                if obj['samples'][key].has_key('m_reads_sequenced'):
+                    if obj['samples'][key]['m_reads_sequenced'] == 'doc_not_found':
+                        if dbobj['samples'][key].has_key('m_reads_sequenced'):
+                            obj['samples'][key]['m_reads_sequenced'] = dbobj['samples'][key]['m_reads_sequenced']
+            try:
+                if (obj['samples'][key]['status'] == 'doc_not_found') or (obj['samples'][key]['status'] == None):
+                    obj['samples'][key].pop('status')
+            except: pass
+            try:
+                if (obj['samples'][key]['m_reads_sequenced'] == 'doc_not_found') or (obj['samples'][key]['m_reads_sequenced'] == None):
+                    obj['samples'][key].pop('m_reads_sequenced')
+            except: pass
     return obj
 
 def find_proj_from_view(proj_db, project_name):
