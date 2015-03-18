@@ -106,6 +106,7 @@ class Couch(Database):
 
         :param name: unique name identifier (primary key, not the uuid)
         :param field: get 'field' of document, i.e. key in document dict
+        :param use_id_view: Boolean to mention which view to use (name or id)
         """
         if not self._doc_type:
             return
