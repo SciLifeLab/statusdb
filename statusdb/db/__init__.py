@@ -44,7 +44,7 @@ class Couch(Database):
     _update_fn = None
 
     def __init__(self, log=None, url=None,conf=None, **kwargs):
-        
+
         # Load from config if we have one
         config = statusdb_config.load_config(conf)
         try:
@@ -61,7 +61,7 @@ class Couch(Database):
                 raise KeyError("The configuration file is missing an essential key, either 'url', 'port', 'username', or 'password'")
             self.db= config['statusdb'].get('db')
 
-        
+
         # Overwrite with command line options if we have them
         if 'username' in kwargs:
             self.user = kwargs['username']
@@ -73,13 +73,13 @@ class Couch(Database):
             self.db = kwargs['db']
         if 'url' in kwargs:
             self.url = kwargs['url']
-        
+
         # Connect to the database
         self.url_string = "http://{}:{}@{}:{}".format(self.user, self.pw, self.url, self.port)
         self.display_url_string = "http://{}:{}@{}:{}".format(self.user, "*********", self.url, self.port)
         if log:
             self.log = log
-        super(Couch, self).__init__(**kwargs)        
+        super(Couch, self).__init__(**kwargs)
         if not self.con:
             raise ConnectionError("Connection failed for url {}".format(self.display_url_string))
 
@@ -100,20 +100,25 @@ class Couch(Database):
         except:
             return None
 
-    def get_entry(self, name, field=None):
+    def get_entry(self, name, field=None, use_id_view=False):
         """Retrieve entry from db for a given name, subset to field if
         that value is passed.
 
         :param name: unique name identifier (primary key, not the uuid)
         :param field: get 'field' of document, i.e. key in document dict
+        :param use_id_view: Boolean to mention which view to use (name or id)
         """
         if not self._doc_type:
             return
         self.log.debug("retrieving field entry in field '{}' for name '{}'".format(field, name))
-        if self.name_view.get(name, None) is None:
+        if use_id_view:
+            view = self.id_view
+        else:
+            view = self.name_view
+        if view.get(name, None) is None:
             self.log.warn("no entry '{}' in {}".format(name, self.db))
             return None
-        doc = self._doc_type(**self.db.get(self.name_view.get(name)))
+        doc = self._doc_type(**self.db.get(view.get(name)))
         if field:
             return doc[field]
         else:
