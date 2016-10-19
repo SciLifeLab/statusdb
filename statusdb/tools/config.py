@@ -10,6 +10,8 @@ def load_config(config_file=None):
     """
     try:
         yaml_config = os.path.join(os.environ.get('HOME'), '.ngi_config', 'statusdb.yaml')
+        if not os.path.exists(yaml_config):
+            yaml_config = os.path.join(os.environ.get("STATUS_DB_CONFIG"))
         config=config_file or yaml_config
         with open(config) as f:
             conf = yaml.load(f)
