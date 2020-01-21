@@ -14,7 +14,7 @@ def load_config(config_file=None):
             yaml_config = os.path.join(os.environ.get("STATUS_DB_CONFIG"))
         config=config_file or yaml_config
         with open(config) as f:
-            conf = yaml.load(f)
+            conf = yaml.load(f, Loader=yaml.SafeLoader)
             return conf
     except IOError:
         raise IOError(("There was a problem loading the configuration file. "
