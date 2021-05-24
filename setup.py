@@ -7,7 +7,7 @@ except IOError:
     install_requires = []
 
 setup(name = "statusdb",
-    version = "1.0",
+    version = "1.0.0",
     author = "Science for Life Laboratory",
     author_email = "genomics_support@scilifelab.se",
     description = ("Module for connecting to statusdb and retrieve "

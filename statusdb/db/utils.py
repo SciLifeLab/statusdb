@@ -49,7 +49,7 @@ def comp_obj(obj, dbobj):
     ###end temporary
     """compares the two dictionaries obj and dbobj"""
     if len(obj) == len(dbobj):
-        for key in obj.keys():
+        for key in list(obj.keys()):
             try:
                 if obj[key] != dbobj[key]:
                     return False
@@ -61,17 +61,17 @@ def comp_obj(obj, dbobj):
 
 def dont_load_status_if_20158_not_found(obj, dbobj):
     """compares the two dictionaries obj and dbobj"""
-    if obj.has_key('samples') and dbobj.has_key('samples'):
-        keys = list(set(obj['samples'].keys() + dbobj['samples'].keys()))
+    if 'samples' in obj and 'samples' in dbobj:
+        keys = list(set(list(obj['samples'].keys()) + list(dbobj['samples'].keys())))
         for key in keys:
-            if obj['samples'].has_key(key) and dbobj['samples'].has_key(key):
-                if obj['samples'][key].has_key('status'):
+            if key in obj['samples'] and key in dbobj['samples']:
+                if 'status' in obj['samples'][key]:
                     if obj['samples'][key]['status'] == 'doc_not_found':
-                        if dbobj['samples'][key].has_key('status'):
+                        if 'status' in dbobj['samples'][key]:
                             obj['samples'][key]['status'] = dbobj['samples'][key]['status']
-                if obj['samples'][key].has_key('m_reads_sequenced'):
+                if 'm_reads_sequenced' in obj['samples'][key]:
                     if obj['samples'][key]['m_reads_sequenced'] == 'doc_not_found':
-                        if dbobj['samples'][key].has_key('m_reads_sequenced'):
+                        if 'm_reads_sequenced' in dbobj['samples'][key]:
                             obj['samples'][key]['m_reads_sequenced'] = dbobj['samples'][key]['m_reads_sequenced']
             try:
                 if (obj['samples'][key]['status'] == 'doc_not_found') or (obj['samples'][key]['status'] == None):
@@ -136,7 +136,7 @@ def calc_avg_qv(srm):
     try:
         count = [float(x) for x in srm["fastqc"]["stats"]["Per sequence quality scores"]["Count"]]
         quality = srm["fastqc"]["stats"]["Per sequence quality scores"]["Quality"]
-        return round(sum([x*int(y) for x,y in izip(count, quality)])/sum(count), 1)
+        return round(sum([x*int(y) for x,y in zip(count, quality)])/sum(count), 1)
     except:
         return None
 
