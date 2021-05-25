@@ -9,7 +9,7 @@ def load_couch_server(config_file):
     """loads couch server with settings specified in 'config_file'"""
     try:
         stream = open(config_file,'r')
-        db_conf = yaml.load(stream)['statusdb']
+        db_conf = yaml.load(stream, Loader=yaml.SafeLoader)['statusdb']
         url = db_conf['username']+':'+db_conf['password']+'@'+db_conf['url']+':'+str(db_conf['port'])
         couch = couchdb.Server("http://" + url)
         return couch
