@@ -1,6 +1,10 @@
 """Miscallaneous methods"""
 import sys
 from statusdb.tools.log import minimal_logger
+try:
+    input = raw_input
+except NameError:
+    pass
 
 LOG = minimal_logger(__name__)
 
@@ -32,7 +36,7 @@ def query_yes_no(question, default="yes", force=False):
     while True:
         sys.stdout.write(question + prompt)
         if not force:
-            choice = raw_input().lower()
+            choice = input().lower()
         else:
             choice = "yes"
         if default is not None and choice == '':

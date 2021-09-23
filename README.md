@@ -1,7 +1,7 @@
 # statusdb
 
 This repository holds a Python package with wrappers and methods
-designed to work with the Status DB instance of CouchDB at 
+designed to work with the Status DB instance of CouchDB at
 [NGI Stockholm](https://portal.scilifelab.se/genomics/).
 It can be used to retrieve information about project, samples, flow cells and
 anything else stored in the database.
@@ -20,7 +20,7 @@ install the package with the following:
 python setup.py install
 ```
 
-Swap `install` for `develop` if you're going to change any code, to 
+Swap `install` for `develop` if you're going to change any code, to
 avoid having to reinstall every time you make a change.
 
 Finally, you need a config file with the information that the package requires
@@ -30,7 +30,7 @@ to connect to the database. This is held within a config file in your home direc
 ~/.ngi_config/statusdb.yaml
 ```
 
-This file should be yaml formatted 
+This file should be yaml formatted
 and look like this:
 
 ```bash
@@ -59,3 +59,5 @@ samples = proj['samples']
   * Pulled code into own repository and updated methods.
 * [Per Unneberg](https://github.com/percyfal)
   * Wrote original code, as part of the [scilifelab](https://github.com/SciLifeLab/scilifelab) repository.
+* [Chuan Wang](https://github.com/chuan-wang)
+  * Port scripts to support Python 3.

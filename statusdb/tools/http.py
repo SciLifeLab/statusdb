@@ -1,6 +1,12 @@
 """Utilities for working with urls"""
-import httplib
-import urlparse
+try:
+    import http.client as httplib
+except ImportError:
+    import httplib
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 ## From http://pythonadventures.wordpress.com/2010/10/17/check-if-url-exists/
 def get_server_status_code(url):
@@ -13,7 +19,7 @@ def get_server_status_code(url):
         conn = httplib.HTTPConnection(host=pcs.hostname, port=pcs.port)
         conn.request('HEAD', pcs.path)
         return conn.getresponse().status
-    except StandardError:
+    except Exception:
         return None
 
 def check_url(url):

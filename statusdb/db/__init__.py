@@ -2,10 +2,14 @@
 import os
 import sys
 import couchdb
-import ConfigParser
 from statusdb.tools.http import check_url
 from statusdb.tools.log import minimal_logger
 from statusdb.tools import config as statusdb_config
+try:
+    import configparser
+except ImportError:
+    import ConfigParser
+
 
 class ConnectionError(Exception):
     """Exception raised for connection errors.

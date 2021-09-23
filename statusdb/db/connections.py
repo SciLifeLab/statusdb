@@ -2,7 +2,6 @@
 import re
 import collections
 from uuid import uuid4
-from itertools import izip
 from datetime import datetime
 from statusdb.db import Couch
 from statusdb.db.utils import save_couchdb_obj
@@ -23,7 +22,7 @@ def utc_time():
 # FIX ME: make override work
 def _update(d, u, override=True):
     """Update values of a nested dictionary of varying depth"""
-    for k, v in u.iteritems():
+    for k, v in u.items():
         if isinstance(v, collections.Mapping):
             r = _update(d.get(k, {}), v)
             d[k] = r
@@ -48,9 +47,9 @@ def _match_barcode_name_to_project_sample(barcode_name, project_samples, extensi
 
     :returns: dictionary with keys project sample name and project sample or None
     """
-    if barcode_name in project_samples.keys():
+    if barcode_name in list(project_samples.keys()):
         return {'sample_name':barcode_name, 'project_sample':project_samples[barcode_name]}
-    for project_sample_name in project_samples.keys():
+    for project_sample_name in list(project_samples.keys()):
         # Look for cases where barcode name is formatted in a way that does not conform to convention
         # NB: only do this interactively!!!
         if not re.search(re_project_id_nr, barcode_name):
@@ -129,8 +128,8 @@ def update_fn(cls, db, obj, viewname = "names/id_to_name", key="name"):
     """
     t_utc = utc_time()
     def equal(a, b):
-        a_keys = [str(x) for x in a.keys() if x not in ["_id", "_rev", "creation_time", "modification_time"]]
-        b_keys = [str(x) for x in b.keys() if x not in ["_id", "_rev", "creation_time", "modification_time"]]
+        a_keys = [str(x) for x in list(a.keys()) if x not in ["_id", "_rev", "creation_time", "modification_time"]]
+        b_keys = [str(x) for x in list(b.keys()) if x not in ["_id", "_rev", "creation_time", "modification_time"]]
         keys = list(set(a_keys + b_keys))
         return {k:a.get(k, None) for k in keys} == {k:b.get(k, None) for k in keys}
 
@@ -268,8 +267,8 @@ class SampleRunMetricsConnection(Couch):
         :returns sample_ids: list of couchdb sample ids
         """
         self.log.debug("retrieving sample ids subset by flowcell '{}' and sample_prj '{}'".format(fc_id, sample_prj))
-        fc_sample_ids = [self.name_fc_view[k].id for k in self.name_fc_view.keys() if self.name_fc_view[k].value == fc_id] if fc_id else []
-        prj_sample_ids = [self.name_proj_view[k].id for k in self.name_proj_view.keys() if self.name_proj_view[k].value == sample_prj] if sample_prj else []
+        fc_sample_ids = [self.name_fc_view[k].id for k in list(self.name_fc_view.keys()) if self.name_fc_view[k].value == fc_id] if fc_id else []
+        prj_sample_ids = [self.name_proj_view[k].id for k in list(self.name_proj_view.keys()) if self.name_proj_view[k].value == sample_prj] if sample_prj else []
         # | -> union, & -> intersection
         if len(fc_sample_ids) > 0 and len(prj_sample_ids) > 0:
             sample_ids = list(set(fc_sample_ids) & set(prj_sample_ids))
@@ -297,7 +296,7 @@ class SampleRunMetricsConnection(Couch):
         """
         self.log.debug("retrieving samples subset by flowcell '{}' and sample_prj '{}'".format(fc_id, sample_prj))
         sample_ids = self.get_sample_ids(fc_id, sample_prj)
-        inv_view = {v:k for k,v in self.name_view.iteritems()}
+        inv_view = {v:k for k,v in self.name_view.items()}
         sample_names = [inv_view[x] for x in sample_ids]
         return [self.get_entry(x) for x in sample_names]
 
@@ -337,7 +336,7 @@ class FlowcellRunMetricsConnection(Couch):
         project names are formatted as J__Doe_00_01 in
         Demultiplex_stats.htm.
         """
-        if flowcell not in self.stat_view.keys():
+        if flowcell not in list(self.stat_view.keys()):
             return None, None
         stats = self.stat_view.get(flowcell)
         stats_d = {"{}-{}-{}".format(item.get("Project", None).replace("__", "."),
@@ -355,7 +354,7 @@ class FlowcellRunMetricsConnection(Couch):
 
         # Get the error rate for non-index reads and add them
         summary = fc.get("illumina",{}).get("Summary",{})
-        for read in summary.values():
+        for read in list(summary.values()):
             if read.get("ReadType","").strip() != "(Index)":
                 r = float(read.get(lane,{}).get("ErrRatePhiX","-1"))
                 # Only use the value if error rate is >0.0
@@ -404,7 +403,7 @@ class FlowcellRunMetricsConnection(Couch):
         """Get all runs with the specified storage status.
         """
         self.log.info("Fetching all Flowcells with storage status \"{}\"".format(status))
-        return {run: info for run, info in self.storage_status_view.iteritems() if info.get("storage_status") == status}
+        return {run: info for run, info in self.storage_status_view.items() if info.get("storage_status") == status}
 
     def set_storage_status(self, doc_id, status):
         """Sets the run storage status.
@@ -452,7 +451,7 @@ class ProjectSummaryConnection(Couch):
     def _get_sample_run_metrics(self, v):
         if v.get('library_prep', None):
             library_preps = v.get('library_prep')
-            return {k:v for kk in library_preps.keys() for k, v in library_preps[kk]['sample_run_metrics'].items()} if library_preps else None
+            return {k:v for kk in list(library_preps.keys()) for k, v in library_preps[kk]['sample_run_metrics'].items()} if library_preps else None
         else:
             return v.get('sample_run_metrics', None)
 
@@ -466,7 +465,7 @@ class ProjectSummaryConnection(Couch):
         :returns: ordered amount of reads if present, None otherwise
         """
         try:
-            amount = samples.values()[0]["details"]["reads_min"]
+            amount = list(samples.values())[0]["details"]["reads_min"]
         except (TypeError, KeyError):
             amount = self.get_entry(project_name, 'min_m_reads_per_sample_ordered')
         finally:
@@ -483,10 +482,10 @@ class ProjectSummaryConnection(Couch):
             return None
         project_samples = project.get('samples', None)
         map_d = {}
-        for project_sample_name,sample in project_samples.iteritems():
+        for project_sample_name,sample in project_samples.items():
             if sample.get('library_prep', None):
                 library_preps = sample.get('library_prep')
-                lkeys = library_preps.keys()
+                lkeys = list(library_preps.keys())
                 lkeys.sort(reverse=True)
                 map_d[project_sample_name] = {k:kk for kk in lkeys[0] for k, v in library_preps[kk].get('sample_run_metrics', {}).items()} if library_preps else None
             else:
