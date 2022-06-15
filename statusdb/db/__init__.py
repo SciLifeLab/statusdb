@@ -57,12 +57,11 @@ class Couch(Database):
             raise KeyError("The configuration file does not have a 'statusdb' key")
         else:
             try:
-                self.port = config['statusdb']['port']
                 self.url= config['statusdb']['url']
                 self.user= config['statusdb']['username']
                 self.pw= config['statusdb']['password']
             except KeyError:
-                raise KeyError("The configuration file is missing an essential key, either 'url', 'port', 'username', or 'password'")
+                raise KeyError("The configuration file is missing an essential key, either 'url', 'username', or 'password'")
             self.db= config['statusdb'].get('db')
 
 
@@ -71,16 +70,14 @@ class Couch(Database):
             self.user = kwargs['username']
         if 'pw' in kwargs:
             self.pw = kwargs['password']
-        if 'port' in kwargs:
-            self.port = kwargs['port']
         if 'db' in kwargs:
             self.db = kwargs['db']
         if 'url' in kwargs:
             self.url = kwargs['url']
 
         # Connect to the database
-        self.url_string = "http://{}:{}@{}:{}".format(self.user, self.pw, self.url, self.port)
-        self.display_url_string = "http://{}:{}@{}:{}".format(self.user, "*********", self.url, self.port)
+        self.url_string = "https://{}:{}@{}".format(self.user, self.pw, self.url)
+        self.display_url_string = "https://{}:{}@{}".format(self.user, "*********", self.url)
         if log:
             self.log = log
         super(Couch, self).__init__(**kwargs)

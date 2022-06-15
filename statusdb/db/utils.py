@@ -10,8 +10,8 @@ def load_couch_server(config_file):
     try:
         stream = open(config_file,'r')
         db_conf = yaml.load(stream, Loader=yaml.SafeLoader)['statusdb']
-        url = db_conf['username']+':'+db_conf['password']+'@'+db_conf['url']+':'+str(db_conf['port'])
-        couch = couchdb.Server("http://" + url)
+        url = db_conf['username']+':'+db_conf['password']+'@'+db_conf['url']
+        couch = couchdb.Server("https://" + url)
         return couch
     except KeyError:
         raise RuntimeError("\"statusdb\" section missing from configuration file.")

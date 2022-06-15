@@ -38,7 +38,6 @@ statusdb:
     username: <login as user>
     password: <password to use>
     url: <full url of the database>
-    port: <port>
 ```
 
 ## Usage
