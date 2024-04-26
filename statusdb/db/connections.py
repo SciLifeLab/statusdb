@@ -330,7 +330,7 @@ class FlowcellRunMetricsConnection(Couch):
         pass
 
     def get_barcode_lane_statistics(self, project_id, sample_id, flowcell, lane):
-	"""Get Mean Quality Score (PF) and % of >= Q30 Bases (PF) for
+	    """Get Mean Quality Score (PF) and % of >= Q30 Bases (PF) for
         project_id, sample_id, flow_cell, lane. In the current
         implementation a unique key is made consisting of
         project-sample-lane. Relies entirely on assumption that all
